@@ -63,3 +63,8 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
+
+OpeningaPDF/ios/Pods
+OpeningaPDF/node_modules/*
+OpeningaPDF/.idea/*
+OpeningaPDF/ios/Podfile.lock

@@ -1,95 +1,63 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * @format
+ * @flow strict-local
  */
 
-import React, { Component } from 'react';
-import {
-  NativeModules,
-  Platform,
-  StyleSheet,
-  Dimensions,
-  Button,
-  View
-} from 'react-native';
-import { StackNavigator } from 'react-navigation';
+import React from 'react';
 import Pdf from 'react-native-pdf';
+import {Dimensions, StyleSheet, View, Button, Platform} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-var PSPDFKit = NativeModules.PSPDFKit;
+const DOCUMENT =
+  Platform.OS === 'ios'
+    ? require('./Document.pdf')
+    : {uri: 'bundle-assets://Document.pdf'};
 
-if (Platform.OS === 'ios') {
-  PSPDFKit.setLicenseKey('INSERT_YOUR_LICENSE_KEY_HERE');
-}
+console.log('DOCUMENT', DOCUMENT);
+const PdfScreen = ({navigation}) => {
+  return <Pdf source={DOCUMENT} style={styles.pdf} />;
+};
 
-const DOCUMENT = Platform.OS === 'ios' ? 'document.pdf' : "file:///sdcard/document.pdf";
+const HomeScreen = ({navigation}) => {
+  return (
+    <View style={styles.container}>
+      <Button onPress={() => navigation.navigate('Pdf')} title="Open PDF" />
+    </View>
+  );
+};
 
-// Simple screen containing a "Open PDF" button
-class HomeScreen extends Component {
-  _presentPSPDFKit() {
-    PSPDFKit.present(DOCUMENT, {
-        pageTransition: 'scrollContinuous',
-        scrollDirection: 'vertical',
-        documentLabelEnabled: true,
-      })
-  }
+const Stack = createNativeStackNavigator();
 
-  static navigationOptions = {
-    title: 'Home'
-  };
-
-  render() {
-    const { navigate } = this.props.navigation;
-    return (
-      <View style={styles.container}>
-        <Button
-          onPress={() => navigate('Pdf')}
-          title='Open PDF with react-native-pdf'
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{title: 'Home'}}
         />
-        <Button
-          onPress={this._presentPSPDFKit}
-          title='Open PDF with PSPDFKit'
+        <Stack.Screen
+          name="Pdf"
+          component={PdfScreen}
+          options={{title: 'PDF'}}
         />
-      </View>
-    );
-  }
-}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
 
-// Screen that shows the contents of a PDF
-class PdfScreen extends Component {
-  static navigationOptions = {
-    title: 'PDF'
-  };
-
-  render() {
-    const source = require('./document.pdf');
-
-    return <Pdf
-              source={source}
-              style={styles.pdf}
-            />;
-  }
-}
-
-const PdfApp = StackNavigator({
-  Home: { screen: HomeScreen },
-  Pdf: { screen: PdfScreen }
-});
-
-export default class App extends Component<{}> {
-  render() {
-    return <PdfApp />;  
-  }
-}
+export default App;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    pdf: {
-        flex: 1,
-        width: Dimensions.get('window').width,
-    }
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pdf: {
+    flex: 1,
+    width: Dimensions.get('window').width,
+  },
 });
